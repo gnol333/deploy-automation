@@ -7,9 +7,11 @@ A Next.js application that automates deployment from GitHub repositories. Select
 - 🔍 **GitHub Integration**: Fetch commits from any GitHub repository
 - 📋 **Commit Selection**: View commit messages, authors, and timestamps
 - 🚀 **Automated Deployment**: One-click deployment of selected commits
-- 🔧 **Configurable**: Custom build commands and deployment paths
+- 🔧 **Multi-Framework Support**: Works with Next.js, React, Vue, Angular, and static sites
+- 🎯 **Smart Build Detection**: Automatically detects build outputs (.next, build, dist, out)
 - 🔒 **Private Repository Support**: Optional GitHub token for private repos
 - 📊 **Real-time Status**: Live deployment progress and status updates
+- 🧹 **Flexible Deployment**: Handles projects with or without build steps
 
 ## Prerequisites
 
@@ -22,7 +24,7 @@ A Next.js application that automates deployment from GitHub repositories. Select
 
 1. Clone this repository:
 ```bash
-git clone <this-repo-url>
+git clone https://github.com/gnol333/deploy-automation.git
 cd deploy-automation
 ```
 
@@ -62,6 +64,35 @@ Click the "Fetch Commits" button to retrieve the latest 20 commits from your rep
 3. Click "Deploy" on the desired commit
 4. Monitor the deployment status
 
+## Supported Project Types
+
+The deployment system automatically detects and handles various project types:
+
+### **Next.js Projects**
+- Detects `.next/` build output
+- Handles both static and server-side builds
+- Copies build files and static assets
+
+### **React/Vue Projects**
+- Detects `build/` directory (Create React App, Vue CLI)
+- Handles production builds
+- Copies optimized static files
+
+### **Vite/Webpack Projects**
+- Detects `dist/` directory
+- Handles modern build tools
+- Copies bundled assets
+
+### **Static Sites**
+- Detects `public/` or `out/` directories
+- Handles Jekyll, Hugo, or custom static sites
+- Copies static files directly
+
+### **Any Project**
+- Fallback: copies entire project (excluding node_modules, .git)
+- Works with custom build setups
+- Flexible deployment for any framework
+
 ## GitHub Token Setup
 
 For private repositories, you'll need a GitHub Personal Access Token:
@@ -76,10 +107,22 @@ When you deploy a commit, the system:
 
 1. **Clones** the repository to a temporary directory
 2. **Checks out** the specific commit
-3. **Installs** dependencies (`npm install`)
-4. **Builds** the project (using your build command)
-5. **Copies** build files to the deployment path
-6. **Cleans up** temporary files
+3. **Installs** dependencies (if package.json exists)
+4. **Builds** the project (if build command provided)
+5. **Detects** the appropriate build output directory
+6. **Copies** files to the deployment path
+7. **Cleans up** temporary files
+
+## Build Detection Logic
+
+The system automatically searches for build outputs in this order:
+
+1. `.next/` - Next.js builds
+2. `build/` - React/Vue builds  
+3. `dist/` - Vite/Webpack builds
+4. `out/` - Next.js static exports
+5. `public/` - Static files
+6. **Fallback**: Entire project (excluding node_modules, .git, temp files)
 
 ## Security Considerations
 
@@ -98,7 +141,9 @@ Common build commands for different frameworks:
 - **React**: `npm run build`
 - **Vue.js**: `npm run build`
 - **Angular**: `npm run build --prod`
+- **Vite**: `npm run build`
 - **Custom**: Any valid npm script
+- **Static Sites**: Leave empty (no build needed)
 
 ### Deployment Paths
 
@@ -133,18 +178,38 @@ Deploy a specific commit.
 }
 ```
 
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Successfully deployed commit abc123 to /var/www/html",
+  "commitSha": "abc123...",
+  "deployPath": "/var/www/html",
+  "buildDirectory": ".next"
+}
+```
+
 ## Troubleshooting
 
 ### Common Issues
 
 1. **Permission Denied**: Ensure the deployment path has write permissions
 2. **Git Clone Failed**: Check repository URL and network connectivity
-3. **Build Failed**: Verify build command and dependencies
+3. **Build Failed**: Verify build command and dependencies (deployment continues without build)
 4. **GitHub API Rate Limit**: Use a GitHub token to increase rate limits
+5. **No Build Output**: System will copy entire project as fallback
 
 ### Logs
 
 Check the browser console and server logs for detailed error messages.
+
+## Recent Improvements
+
+### v1.1.0 - Multi-Framework Support
+- ✅ **Smart Build Detection**: Automatically detects build outputs for different frameworks
+- ✅ **Flexible Deployment**: Works with or without build steps
+- ✅ **Better Error Handling**: Continues deployment even if build fails
+- ✅ **Universal Compatibility**: Supports any project type with intelligent fallbacks
 
 ## Development
 
