@@ -1,0 +1,8 @@
+# Global code owners
+* @gnol333
+
+# Specific file protections
+package.json @gnol333
+package-lock.json @gnol333
+.github/ @gnol333
+src/app/api/ @gnol333 
