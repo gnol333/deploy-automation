@@ -38,7 +38,7 @@ npm install
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+4. Open [http://localhost:3020](http://localhost:3020) in your browser
 
 ## Usage
 
