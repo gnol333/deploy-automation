@@ -348,6 +348,9 @@ export function PresetModal({
                   onChange={(e) => handleConfigChange('token', e.target.value)}
                   placeholder="ghp_xxxxxxxxxxxx"
                 />
+                <p className="text-xs text-amber-600">
+                  ⚠️ <strong>Team Note:</strong> Tokens will be saved with presets. Avoid sharing preset files outside the team.
+                </p>
               </div>
             </div>
           </div>

@@ -1,15 +1,20 @@
 # Deployment Automation Tool
 
-A Next.js application that automates deployment from GitHub repositories. Select any commit from your repository and deploy it automatically to your server.
+A Next.js application for **local team use** that automates deployment from GitHub repositories. Select any commit from your repository and deploy it automatically to your development/staging servers.
+
+## ⚠️ **For Internal Team Use Only**
+
+This tool is designed for development teams to streamline their deployment workflow in controlled environments. It provides direct server access and should only be used in trusted, internal networks.
 
 ## Features
 
 - 🔍 **GitHub Integration**: Fetch commits from any GitHub repository
 - 📋 **Commit Selection**: View commit messages, authors, and timestamps
 - 🚀 **Automated Deployment**: One-click deployment of selected commits
+- 💾 **Preset Management**: Save and reuse deployment configurations
 - 🔧 **Multi-Framework Support**: Works with Next.js, React, Vue, Angular, and static sites
 - 🎯 **Smart Build Detection**: Automatically detects build outputs (.next, build, dist, out)
-- 🔒 **Private Repository Support**: Optional GitHub token for private repos
+- 🔒 **Private Repository Support**: GitHub token support for private repos
 - 📊 **Real-time Status**: Live deployment progress and status updates
 - 🧹 **Flexible Deployment**: Handles projects with or without build steps
 
@@ -19,6 +24,7 @@ A Next.js application that automates deployment from GitHub repositories. Select
 - Git installed on your system
 - Access to the target deployment directory
 - GitHub repository (public or private with token)
+- **Internal network environment** (not for production internet-facing use)
 
 ## Installation
 
@@ -100,6 +106,24 @@ For private repositories, you'll need a GitHub Personal Access Token:
 1. Go to GitHub Settings → Developer settings → Personal access tokens
 2. Generate a new token with `repo` scope
 3. Copy the token and paste it in the GitHub Token field
+
+## Team Setup Recommendations
+
+### For Small Teams (2-5 developers)
+- Share one GitHub token across the team
+- Use presets to standardize deployment configs  
+- Each developer can save their own presets locally
+
+### For Larger Teams (5+ developers)
+- Consider individual GitHub tokens per developer
+- Standardize preset naming conventions
+- Use export/import to share useful presets
+
+### Security Notes for Teams
+- GitHub tokens are saved in browser localStorage for convenience
+- Avoid sharing preset export files outside your team
+- Use tokens with minimal required scopes (just `repo` access)
+- Consider token rotation on a regular schedule
 
 ## Deployment Process
 
@@ -233,4 +257,4 @@ MIT License - feel free to use this in your projects!
 
 ---
 
-**Note**: This tool is designed for development and staging environments. For production use, consider additional security measures and testing.
+**Note**: This tool is designed for **development teams in controlled environments**. For production internet-facing deployments, consider additional security measures including access controls, audit logging, and proper secrets management.
