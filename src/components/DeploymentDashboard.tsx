@@ -8,9 +8,10 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { GitBranch, Play, RefreshCw, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { GitBranch, Play, RefreshCw, AlertCircle, CheckCircle, Clock, Save } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Commit, DeploymentConfig, DeploymentStatus } from '@/types';
+import { PresetSelector, PresetModal } from '@/components/presets';
 
 export default function DeploymentDashboard() {
   const [config, setConfig] = useState<DeploymentConfig>({
@@ -27,6 +28,19 @@ export default function DeploymentDashboard() {
   const [deploymentStatus, setDeploymentStatus] = useState<DeploymentStatus>({
     isDeploying: false,
   });
+
+  // Preset state management
+  const [showPresetModal, setShowPresetModal] = useState(false);
+  const [presetModalMode, setPresetModalMode] = useState<'create' | 'edit'>('create');
+  const [editingPresetId, setEditingPresetId] = useState<string | undefined>();
+  const [showSavePresetPrompt, setShowSavePresetPrompt] = useState(false);
+  const [hasConfigChanged, setHasConfigChanged] = useState(false);
+
+  // Track config changes to show save prompt
+  useEffect(() => {
+    const hasValidConfig = config.owner && config.repo && config.repoUrl && config.deployPath;
+    setHasConfigChanged(Boolean(hasValidConfig));
+  }, [config]);
 
   const fetchCommits = async () => {
     if (!config.owner || !config.repo) {
@@ -47,6 +61,11 @@ export default function DeploymentDashboard() {
 
       if (response.ok) {
         setCommits(data.commits);
+        
+        // Show save preset prompt after successful fetch if config has changed
+        if (hasConfigChanged && data.commits.length > 0) {
+          setShowSavePresetPrompt(true);
+        }
       } else {
         alert(`Error: ${data.error}`);
       }
@@ -106,6 +125,34 @@ export default function DeploymentDashboard() {
     }
   };
 
+  // Preset handlers
+  const handleConfigLoad = (newConfig: DeploymentConfig) => {
+    setConfig(newConfig);
+    setShowSavePresetPrompt(false);
+  };
+
+  const handleCreatePreset = () => {
+    setPresetModalMode('create');
+    setEditingPresetId(undefined);
+    setShowPresetModal(true);
+    setShowSavePresetPrompt(false);
+  };
+
+  const handleEditPreset = (presetId: string) => {
+    setPresetModalMode('edit');
+    setEditingPresetId(presetId);
+    setShowPresetModal(true);
+  };
+
+  const handleClosePresetModal = () => {
+    setShowPresetModal(false);
+    setEditingPresetId(undefined);
+  };
+
+  const dismissSavePrompt = () => {
+    setShowSavePresetPrompt(false);
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex items-center space-x-2">
@@ -122,6 +169,43 @@ export default function DeploymentDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Preset Selector */}
+          <PresetSelector
+            currentConfig={config}
+            onConfigLoad={handleConfigLoad}
+            onCreatePreset={handleCreatePreset}
+            onEditPreset={handleEditPreset}
+            className="mb-4"
+          />
+
+          {/* Save Preset Prompt */}
+          {showSavePresetPrompt && (
+            <Alert className="border-blue-500 bg-blue-50">
+              <Save className="h-4 w-4" />
+              <AlertDescription className="flex items-center justify-between">
+                <span>
+                  Great! Your configuration worked. Would you like to save it as a preset for future use?
+                </span>
+                <div className="flex items-center space-x-2 ml-4">
+                  <Button
+                    size="sm"
+                    onClick={handleCreatePreset}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Save as Preset
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={dismissSavePrompt}
+                  >
+                    Not Now
+                  </Button>
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="owner">Repository Owner</Label>
@@ -278,6 +362,15 @@ export default function DeploymentDashboard() {
           </CardContent>
         </Card>
       )}
+
+      {/* Preset Modal */}
+      <PresetModal
+        isOpen={showPresetModal}
+        onClose={handleClosePresetModal}
+        currentConfig={config}
+        editPresetId={editingPresetId}
+        mode={presetModalMode}
+      />
     </div>
   );
 } 
